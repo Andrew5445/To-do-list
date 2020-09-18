@@ -10,6 +10,7 @@ export class HomeComponent {
   public tasks: Task[];
   public filteredTasksByDate: Task[];
   hideTaskId: boolean = true;
+  taskNameEmpty: boolean = false;
   date = new FormControl(new Date());
 
   constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) {
@@ -27,16 +28,29 @@ export class HomeComponent {
   }
   addTask(name, priority): void {
 
-    const headers: HttpHeaders = new HttpHeaders();
-    headers.append('Content-Type', 'application/json');
-    headers.append('observe', 'response');
-    let task: Task = { taskID: 0, taskName: name, taskPriority: priority, taskStatus: false, taskDate: this.date.value };
-    this.http.post(this.baseUrl + "tasks", task, { headers: headers }).subscribe(result => {
-      task.taskID = Number(result);
-      this.tasks.push(task);
-      this.filteredTasksByDate = this.performFilteringOnTasks();
-      console.log("Task added." + JSON.stringify(result));
-    }, error => console.error(error));
+    //validate input
+    if (name.length !== 0) {
+      this.taskNameEmpty = false;
+      const headers: HttpHeaders = new HttpHeaders();
+      headers.append('Content-Type', 'application/json');
+      headers.append('observe', 'response');
+      let task: Task = {
+        taskID: 0,
+        taskName: name,
+        taskPriority: priority,
+        taskStatus: false,
+        taskDate: this.date.value
+      };
+      this.http.post(this.baseUrl + "tasks", task, { headers: headers }).subscribe(result => {
+        task.taskID = Number(result);
+        this.tasks.push(task);
+        this.filteredTasksByDate = this.performFilteringOnTasks();
+        console.log("Task added." + JSON.stringify(result));
+      },
+        error => console.error(error));
+    } else {
+      this.taskNameEmpty = true;
+    }
   }
   updateTaskStatus(checkBox, taskName, taskID) {
 
@@ -61,6 +75,13 @@ export class HomeComponent {
       body: taskToBeDeleted,
     };
     this.http.delete(this.baseUrl + "tasks", options).subscribe(result => { console.log("Task removed." + JSON.stringify(result)); }, error => console.error(error));
+  }
+  validateTaskName(taskName): boolean {
+    if (taskName.length === 0) {
+      return false;
+    } else {
+      return true;
+    }
   }
   performFilteringOnTasks(): Task[] {
 
