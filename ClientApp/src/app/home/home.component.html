@@ -1,0 +1,60 @@
+<div class='card'>
+  <div class='card-header'>
+    
+  </div>
+  <div class='card-body'>
+    <div class='row'>
+      <input matInput [matDatepicker]="picker" [formControl]="date" (dateChange)="changeDate($event)">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </div>
+    <div class='row'>
+      <div class='col-md-12'>
+      </div>
+    </div>
+    <div class='table-responsive'>
+      <table class='table'>
+        <thead>
+          <tr>
+            <th>Task name</th>
+            <th>Priority</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor='let task of filteredTasksByDate'>
+            <td [hidden]="hideTaskId" #taskID>{{task.taskID}}</td>
+            <td #taskName>{{ task.taskName }}</td>
+            <td>{{ task.taskPriority }}</td>
+            <td>
+              <input #checkBox type="checkbox" class="form-check-input" id="materialUnchecked" [checked]="task.taskStatus" (change)="updateTaskStatus(checkBox,taskName,taskID)">
+            </td>
+            <td>
+              <button type="button" class="close" aria-label="Close" (click)=removeTask(taskName,taskID)>
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input #name type="text" />
+            </td>
+            <td>
+              <select #priority matNativeControl required>
+                <option value="Low">Low</option>
+                <option value="Normal">Normal</option>
+                <option value="High">High</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <button (click)="addTask(name.value,priority.value)">Add task</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
